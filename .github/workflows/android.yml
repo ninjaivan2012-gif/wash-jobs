@@ -1,0 +1,45 @@
+name: Build Android APK
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 17 }
+      - name: Make Capacitor project
+        run: |
+          mkdir -p app/www && cd app
+          cp ../index.html ../manifest.json ../icon-*.png www/
+          npm init -y >/dev/null
+          npm i @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/filesystem@6 @capacitor/share@6
+          npx cap init "Wash Jobs" com.ninjaivan.washjobs --web-dir www
+          npx cap add android
+          rm -rf android/app/src/main/res/mipmap-anydpi-v26
+          for d in mdpi hdpi xhdpi xxhdpi xxxhdpi; do cp ../android-res/mipmap-$d/*.png android/app/src/main/res/mipmap-$d/; done
+          sed -i "s/versionCode 1/versionCode ${{ github.run_number }}/; s/versionName \"1.0\"/versionName \"1.${{ github.run_number }}\"/" android/app/build.gradle
+          npx cap sync android
+      - name: Build release APK
+        run: cd app/android && chmod +x gradlew && ./gradlew assembleRelease --no-daemon
+      - name: Sign APK (key made fresh for this build, never stored)
+        run: |
+          PW=$(openssl rand -hex 16)
+          keytool -genkeypair -keystore build.jks -alias washjobs -keyalg RSA -keysize 2048 -validity 10000 -storepass "$PW" -keypass "$PW" -dname "CN=Wash Jobs" >/dev/null 2>&1
+          BT=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -1)
+          $BT/zipalign -f 4 app/android/app/build/outputs/apk/release/app-release-unsigned.apk aligned.apk
+          $BT/apksigner sign --ks build.jks --ks-pass "pass:$PW" --key-pass "pass:$PW" --ks-key-alias washjobs --out WashJobs.apk aligned.apk
+          $BT/apksigner verify WashJobs.apk
+          rm build.jks
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.${{ github.run_number }}
+          name: Wash Jobs 1.${{ github.run_number }}
+          files: WashJobs.apk
+          make_latest: true
