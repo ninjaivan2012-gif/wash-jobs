@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ffffff"><link rel="manifest" href="manifest.json"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
+<title>Wash Jobs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style id="css">
+/* VOICE: practical and upbeat, a working tool for a one-person pressure washing crew
+   IDEA: the clipboard work-ticket on the truck: a week of jobs with free time marked
+   PICTURE: the live week schedule itself, big hanging times, open slots you tap to book
+   COLOUR/TYPE: wet-concrete slate ground, water blue lead, safety-yellow accent; Archivo + Inter
+   LAYOUT: blue header band with week numbers, tab views, bottom tab bar on phones, sheet editor */
+:root{color-scheme:light;--bg:#fff;--card:#fff;--ink:#000;--mute:#333;--line:#d4d4d4;--blue:#0b63b6;--soft:#eef5fc;--hd:#fff;--yel:#ffc61a;--red:#c63b3b}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,sans-serif;overflow-x:clip;padding-bottom:84px}
+h1,h2,h3{font-family:Archivo,Inter,sans-serif;margin:0;line-height:1.1}
+header{background:var(--hd);color:#000;padding:max(20px,env(safe-area-inset-top)) max(4vw,16px) 0;border-bottom:1px solid var(--line)}
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;max-width:1100px;margin:auto}
+.top h1{font-size:28px;font-weight:800}.top h1 b{color:var(--blue)}
+.stats{display:flex;gap:22px;flex-wrap:wrap;margin-left:auto}
+.stat small{display:block;font-size:13px;opacity:.8}.stat strong{font:800 22px Archivo,sans-serif;white-space:nowrap}
+nav.tabs{display:flex;gap:4px;max-width:1100px;margin:16px auto 0}
+nav.tabs a{color:#000;text-decoration:none;padding:12px 16px;font-weight:600;border-bottom:3px solid transparent}
+nav.tabs a.on{color:var(--blue);border-bottom-color:var(--blue)}
+main{max-width:1100px;margin:auto;padding:18px max(4vw,16px)}
+.bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}.bar h2{font-size:22px}.sp{flex:1}
+.btn{font:600 15px Inter,sans-serif;min-height:44px;padding:0 16px;border-radius:10px;border:0;background:var(--blue);color:#fff;cursor:pointer;white-space:nowrap}
+.btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line)}.btn.sm{min-height:36px;padding:0 12px;font-size:14px}
+.btn.warn{background:var(--red)}.btn.yel{background:var(--yel);color:#14202b}
+.btn:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--yel);outline-offset:2px}
+.days{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:12px}
+.day{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.day.today{border:2px solid var(--blue)}
+.day h3{font-size:17px;display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.tag{font:600 12px Inter,sans-serif;padding:2px 8px;border-radius:99px;background:var(--soft);color:var(--blue);white-space:nowrap}
+.tag.y{background:var(--yel);color:#14202b}.tag.r{background:var(--red);color:#fff}.tag.m{background:var(--line);color:var(--ink)}
+.slot{display:grid;grid-template-columns:62px minmax(0,1fr);gap:10px;padding:8px 0;border-top:1px solid var(--line);align-items:start;width:100%;background:none;border-left:0;border-right:0;border-bottom:0;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.slot:first-of-type{border-top:0}
+.slot time{font:800 16px Archivo,sans-serif;white-space:nowrap}
+.slot .t{font-weight:600}.slot .s{font-size:14px;color:var(--mute)}
+.slot.c{cursor:default}.slot.c .t{color:var(--mute)}
+.slot.j .t{color:var(--blue)}
+.slot.f{border:1.5px dashed var(--blue);border-radius:10px;padding:8px;margin-top:6px;background:var(--soft)}
+.slot.f+.slot{border-top:0}
+.off{color:var(--mute);font-size:14px}
+.list{display:grid;gap:10px}
+.job{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;cursor:pointer;text-align:left;font:inherit;color:inherit;width:100%}
+.job .n{font-weight:600;font-size:17px}.job .p{font:800 18px Archivo,sans-serif;text-align:right;white-space:nowrap}.job .s{font-size:14px;color:var(--mute)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{min-height:36px;padding:0 14px;border-radius:99px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:500 14px Inter,sans-serif;cursor:pointer}
+.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+input,select,textarea{font:16px Inter,sans-serif;width:100%;min-height:44px;padding:8px 10px;border-radius:10px;border:1px solid #bdbdbd;background:#fff;color:#000}
+textarea{min-height:80px;resize:vertical}
+label{display:block;font-size:14px;color:var(--mute);font-weight:500}
+label>input,label>select,label>textarea{margin-top:4px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:10px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr));gap:10px;margin-bottom:18px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.kpi small{color:var(--mute);font-size:14px}.kpi strong{display:block;font:800 clamp(24px,5vw,32px) Archivo,sans-serif;white-space:nowrap}
+.kpi.big{background:var(--blue);color:#fff;border:0}.kpi.big small{color:#e3f0fc}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:16px}
+.card h3{font-size:18px;margin-bottom:10px}
+.mrow{display:grid;grid-template-columns:52px minmax(0,1fr) 92px;gap:10px;align-items:center;padding:5px 0;font-size:14px}
+.mrow .b{height:10px;border-radius:5px;background:var(--blue)}.mrow .b.e{background:var(--yel);margin-top:3px}
+.mrow .v{text-align:right;white-space:nowrap}
+table{width:100%;border-collapse:collapse;font-size:15px}th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}th{color:var(--mute);font-weight:500;font-size:13px}
+td.r,th.r{text-align:right;white-space:nowrap}.neg{color:var(--red)}
+.row{display:flex;gap:8px;align-items:end;flex-wrap:wrap}.row>*{flex:1 1 120px}.row>.btn{flex:0 0 auto}
+.x{background:none;border:0;color:var(--mute);font-size:22px;min-width:44px;min-height:44px;cursor:pointer}
+.empty{text-align:center;padding:30px 16px;color:var(--mute);background:var(--card);border:1px dashed var(--line);border-radius:14px}
+.empty p{margin:0 0 12px}
+.scrim{position:fixed;inset:0;background:#0008;z-index:20;display:flex;justify-content:center;align-items:flex-end}
+.sheet{background:var(--card);width:min(720px,100%);max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:18px 16px 24px}
+@media(min-width:760px){.scrim{align-items:center}.sheet{border-radius:18px}}
+.sheet h2{font-size:22px;margin-bottom:6px}.sheet h4{margin:18px 0 8px;font-size:15px;color:var(--blue)}
+.sug{font-size:14px;color:var(--mute);margin-top:6px}
+.links{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;font-size:14px}.links a{color:var(--blue);font-weight:600}
+.pics{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.pic{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--bg)}.pic img{width:100%;height:100%;object-fit:cover}
+.pic button{position:absolute;top:4px;right:4px;background:#000a;color:#fff;border:0;border-radius:99px;width:30px;height:30px;cursor:pointer}
+.upl{display:flex;align-items:center;justify-content:center;aspect-ratio:1;border:1.5px dashed var(--line);border-radius:10px;color:var(--blue);font-weight:600;cursor:pointer;font-size:14px;text-align:center}
+.upl input{display:none}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px;position:sticky;bottom:-24px;background:var(--card);padding:12px 0}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none}.toast.on{opacity:1}
+.wzs{max-width:640px;margin:auto}.wzs h2{font-size:clamp(26px,6vw,36px);margin:8px 0 10px}.wzs .lead{font-size:17px;margin:0 0 18px}
+.steps{display:flex;gap:6px;margin:6px 0 4px}.steps i{flex:1;height:6px;border-radius:3px;background:var(--line)}.steps i.on{background:var(--blue)}
+.wnav{display:flex;gap:8px;margin-top:22px;position:sticky;bottom:0;background:var(--bg);padding:12px 0 max(12px,env(safe-area-inset-bottom))}.wnav .sp{flex:1}
+body.wz header,body.wz nav.tabs{display:none}body.wz{padding-bottom:0}body.wz main{padding-top:max(24px,env(safe-area-inset-top))}
+.mini{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.note{font-size:13px;color:var(--mute);margin-top:8px}
+.qa{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap}.qa .btn{min-height:40px}
+.job .qa{grid-column:1/-1}
+@media(max-width:700px){nav.tabs{position:fixed;bottom:0;left:0;right:0;margin:0;background:var(--card);border-top:1px solid var(--line);z-index:10;padding:4px 4px max(4px,env(safe-area-inset-bottom))}nav.tabs a{flex:1;text-align:center;color:var(--mute);border-radius:10px;padding:12px 4px}nav.tabs a.on{background:var(--soft);color:var(--blue)}header{padding-bottom:18px}.stats{margin-left:0;width:100%}}
+@media(prefers-reduced-motion:reduce){.toast{transition:none}}
+</style></head><body>
+<template id="tpl">
+<header><div class="top"><h1>Wash<b>Jobs</b></h1><div class="stats" id="stats"></div></div>
+<nav class="tabs" aria-label="Sections"><a href="#week" data-t="week">Week</a><a href="#jobs" data-t="jobs">Jobs</a><a href="#money" data-t="money">Money</a><a href="#setup" data-t="setup">Setup</a></nav></header>
+<main id="view"></main><div id="modal"></div><div class="toast" id="toast" role="status"></div>
+</template>
+<script id="seed" type="application/json">{"settings":{"dayStart":"08:00","dayEnd":"18:00","workDays":[1,2,3,4,5,6],"rates":[{"id":"r1","name":"Driveway / concrete","per":0.2,"min":150},{"id":"r2","name":"House wash","per":0.15,"min":250},{"id":"r3","name":"Patio / pool deck","per":0.25,"min":125},{"id":"r4","name":"Roof soft wash","per":0.3,"min":350}]},"commitments":[],"jobs":[],"expenses":[],"setupDone":false,"savedAt":0}</script>
+<script id="app">
+{
+const KEY='washjobs-v1';
+const idb=new Promise((res,rej)=>{const r=indexedDB.open('washjobs',1);r.onupgradeneeded=()=>r.result.createObjectStore('photos');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+const tx=(mode,fn)=>idb.then(db=>new Promise((res,rej)=>{const t=db.transaction('photos',mode);const q=fn(t.objectStore('photos'));t.oncomplete=()=>res(q&&q.result);t.onerror=()=>rej(t.error)}));
+const putPhoto=(id,b)=>tx('readwrite',st=>st.put(b,id)),getPhoto=id=>tx('readonly',st=>st.get(id)),delPhoto=id=>tx('readwrite',st=>st.delete(id)),photoKeys=()=>tx('readonly',st=>st.getAllKeys());
+const urls={};
+async function photoURL(id){if(urls[id])return urls[id];const b=await getPhoto(id);return b?(urls[id]=URL.createObjectURL(b)):''}
+const toData=b=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsDataURL(b)});
+const $=s=>document.querySelector(s);
+document.body.prepend($('#tpl').content.cloneNode(true));
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,10);
+const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const num=v=>{const n=parseFloat(v);return isFinite(n)?n:0};
+const money=n=>(n<0?'-':'')+'$'+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const toMin=t=>{if(!t)return null;const p=t.split(':').map(Number);return p[0]*60+(p[1]||0)};
+const fmtT=m=>{let h=Math.floor(m/60),mm=Math.round(m%60),ap=h>=12&&h<24?'pm':'am';h=h%12||12;return h+(mm?':'+String(mm).padStart(2,'0'):'')+ap};
+const hhmm=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const parse=s=>{const p=(s||'').split('-').map(Number);return new Date(p[0],(p[1]||1)-1,p[2]||1)};
+const nice=s=>{if(!s)return 'No date';const d=parse(s);return DAYS[d.getDay()]+' '+MON[d.getMonth()]+' '+d.getDate()};
+const TODAY=iso(new Date());
+
+let S=null;try{S=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){}
+if(!S){try{S=JSON.parse($('#seed').textContent)}catch(e){S={}}}
+S=Object.assign({settings:{},commitments:[],jobs:[],expenses:[]},S);
+S.settings=Object.assign({dayStart:'08:00',dayEnd:'18:00',workDays:[1,2,3,4,5,6],rates:[]},S.settings);
+let restoreData=null,installEvt=null,wk=0,jf='up',q='',per='month',draft=null,delAsk=false;
+
+const toast=(m,ms=2200)=>{const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('on'),ms)};
+function save(){S.savedAt=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('Phone storage is full: make a backup');}render();clearTimeout(save.g);save.g=setTimeout(gc,1500)}
+async function gc(){try{const keep=new Set(S.jobs.flatMap(j=>(j.photos||[]).map(p=>p.id)));if(draft)(draft.photos||[]).forEach(p=>keep.add(p.id));for(const k of await photoKeys())if(!keep.has(k)){await delPhoto(k);if(urls[k]){URL.revokeObjectURL(urls[k]);delete urls[k]}}}catch(e){}}
+
+/* ---------- jobs helpers ---------- */
+const jobCost=j=>(j.costs||[]).reduce((a,c)=>a+num(c.amt),0);
+const status=j=>j.paid?['Paid','m']:j.status==='done'?['Needs payment','y']:j.status==='quote'?['Quote','m']:['Scheduled',''];
+const rateFor=id=>S.settings.rates.find(r=>r.id===id);
+const quick=j=>{const id=esc(j.id);if(j.paid)return '';if(j.status==='quote')return `<div class="qa"><button class="btn ghost sm" data-a="qbook" data-id="${id}">Book it</button></div>`;if(j.status!=='done')return `<div class="qa"><button class="btn sm" data-a="qdone" data-id="${id}">✓ Job done</button><button class="btn ghost sm" data-a="qboth" data-id="${id}">Done + paid</button></div>`;return `<div class="qa"><button class="btn yel sm" data-a="qpaid" data-id="${id}">$ Got paid</button></div>`};
+const suggest=(rid,sq)=>{const r=rateFor(rid);if(!r||!num(sq))return null;return Math.max(num(r.min),Math.round(num(sq)*num(r.per)))};
+
+/* ---------- header ---------- */
+function stats(){
+  const ws=weekStart(0),we=new Date(ws);we.setDate(we.getDate()+7);
+  const wj=S.jobs.filter(j=>j.status!=='quote'&&j.date&&parse(j.date)>=ws&&parse(j.date)<we);
+  const owed=S.jobs.filter(j=>j.status==='done'&&!j.paid).reduce((a,j)=>a+num(j.price),0);
+  $('#stats').innerHTML=(installEvt?'<button class="btn yel sm" data-a="install">Install app</button>':'')+[['Jobs this week',wj.length],['Booked this week',money(wj.reduce((a,j)=>a+num(j.price),0))],['Owed to you',money(owed)]].map(s=>`<div class="stat"><small>${s[0]}</small><strong>${esc(s[1])}</strong></div>`).join('');
+}
+
+/* ---------- week ---------- */
+function weekStart(off){const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7)+off*7);return d}
+function dayItems(key,dow){
+  const ds=toMin(S.settings.dayStart),de=toMin(S.settings.dayEnd);
+  const it=S.commitments.filter(c=>+c.day===dow).map(c=>({s:toMin(c.start),e:toMin(c.end),k:'c',c}));
+  S.jobs.filter(j=>j.date===key&&j.status!=='quote').forEach(j=>{const s=toMin(j.time)??ds;it.push({s,e:s+Math.max(.5,num(j.hours)||2)*60,k:'j',j})});
+  it.sort((a,b)=>a.s-b.s);
+  const work=S.settings.workDays.includes(dow);
+  if(work&&key>=TODAY){let cur=ds;const free=[];for(const b of it){if(b.s-cur>=60&&cur<de)free.push({s:cur,e:Math.min(b.s,de),k:'f'});cur=Math.max(cur,b.e)}if(de-cur>=60)free.push({s:cur,e:de,k:'f'});it.push(...free);it.sort((a,b)=>a.s-b.s)}
+  return {it,work};
+}
+function vWeek(){
+  const s=weekStart(wk),e=new Date(s);e.setDate(e.getDate()+6);
+  let h=`<div class="bar"><button class="btn ghost sm" data-a="wk" data-v="-1" aria-label="Previous week">‹</button><h2>${MON[s.getMonth()]} ${s.getDate()} – ${MON[e.getMonth()]} ${e.getDate()}</h2><button class="btn ghost sm" data-a="wk" data-v="1" aria-label="Next week">›</button>${wk?'<button class="btn ghost sm" data-a="wk" data-v="0">This week</button>':''}<span class="sp"></span><button class="btn" data-a="new">+ New job</button></div><div class="days">`;
+  for(let i=0;i<7;i++){
+    const d=new Date(s);d.setDate(d.getDate()+i);const key=iso(d),dow=d.getDay();const {it,work}=dayItems(key,dow);
+    h+=`<section class="day${key===TODAY?' today':''}"><h3>${DAYS[dow]} ${d.getDate()}${key===TODAY?'<span class="tag">Today</span>':''}${!work?'<span class="tag m">Day off</span>':''}</h3>`;
+    if(!it.length)h+=`<div class="off">${work?'Past day':'No plans'}</div>`;
+    for(const x of it){
+      if(x.k==='c')h+=`<div class="slot c"><time>${fmtT(x.s)}</time><div><div class="t">${esc(x.c.label)}</div><div class="s">until ${fmtT(x.e)} · every ${DAYS[dow]}</div></div></div>`;
+      else if(x.k==='j'){const st=status(x.j);h+=`<div class="slot j" role="button" tabindex="0" data-a="edit" data-id="${esc(x.j.id)}"><time>${fmtT(x.s)}</time><div><div class="t">${esc(x.j.name||'Customer')} · ${money(num(x.j.price))}</div><div class="s">${esc(x.j.address||'No address')}</div><span class="tag ${st[1]}">${st[0]}</span>${quick(x.j)}</div></div>`}
+      else h+=`<button class="slot f" data-a="book" data-d="${key}" data-t="${hhmm(x.s)}"><time>${fmtT(x.s)}</time><div><div class="t">Free until ${fmtT(x.e)}</div><div class="s">Tap to book a job here</div></div></button>`;
+    }
+    h+='</section>';
+  }
+  $('#view').innerHTML=h+'</div>'+(S.commitments.length?'':'<p class="note">Add your regular activities in Setup and they will block out time here every week.</p>');
+}
+
+/* ---------- jobs ---------- */
+function vJobs(){
+  const F={up:['Upcoming',j=>j.status!=='done'&&!j.paid&&j.status!=='quote'],quote:['Quotes',j=>j.status==='quote'],owed:['Needs payment',j=>j.status==='done'&&!j.paid],done:['Paid',j=>j.paid],all:['All',()=>true]};
+  let js=S.jobs.filter(F[jf][1]);
+  if(q){const t=q.toLowerCase();js=js.filter(j=>[j.name,j.phone,j.address,j.notes].join(' ').toLowerCase().includes(t))}
+  js.sort((a,b)=>jf==='up'?(a.date+a.time).localeCompare(b.date+b.time):(b.date+b.time).localeCompare(a.date+a.time));
+  let h=`<div class="bar"><h2>Jobs</h2><span class="sp"></span><button class="btn" data-a="new">+ New job</button></div><div class="bar"><div class="chips">${Object.entries(F).map(([k,v])=>`<button class="chip${k===jf?' on':''}" data-a="jf" data-v="${k}">${v[0]} (${S.jobs.filter(v[1]).length})</button>`).join('')}</div></div><input id="q" type="search" placeholder="Search name, phone, address, notes" value="${esc(q)}" style="margin-bottom:12px">`;
+  if(!js.length)h+=`<div class="empty"><p>${S.jobs.length?'No jobs here.':'No jobs yet. Add your first customer.'}</p><button class="btn" data-a="new">+ New job</button></div>`;
+  else h+='<div class="list">'+js.map(j=>{const st=status(j);return `<div class="job" role="button" tabindex="0" data-a="edit" data-id="${esc(j.id)}"><span class="n">${esc(j.name||'Customer')}</span><span class="p">${money(num(j.price))}</span><span class="s">${nice(j.date)}${j.time?' · '+fmtT(toMin(j.time)):''} · ${esc(j.address||'No address')}</span><span><span class="tag ${st[1]}">${st[0]}</span></span>${quick(j)}</div>`}).join('')+'</div>';
+  $('#view').innerHTML=h;
+}
+
+/* ---------- money ---------- */
+function inPer(ds){if(per==='all')return true;if(!ds)return false;const d=parse(ds),n=new Date();if(per==='year')return d.getFullYear()===n.getFullYear();if(per==='month')return d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth();const s=weekStart(0),e=new Date(s);e.setDate(e.getDate()+7);return d>=s&&d<e}
+function vMoney(){
+  const paid=S.jobs.filter(j=>j.paid&&inPer(j.date));
+  const rev=paid.reduce((a,j)=>a+num(j.price),0);
+  const jc=S.jobs.filter(j=>j.status==='done'&&inPer(j.date)).reduce((a,j)=>a+jobCost(j),0);
+  const ex=S.expenses.filter(x=>inPer(x.date)).reduce((a,x)=>a+num(x.amt),0)+jc;
+  const owed=S.jobs.filter(j=>j.status==='done'&&!j.paid).reduce((a,j)=>a+num(j.price),0);
+  const P={week:'This week',month:'This month',year:'This year',all:'All time'};
+  let h=`<div class="bar"><h2>Money</h2><span class="sp"></span><div class="chips">${Object.entries(P).map(([k,v])=>`<button class="chip${k===per?' on':''}" data-a="per" data-v="${k}">${v}</button>`).join('')}</div></div>`;
+  h+=`<div class="kpis"><div class="kpi big"><small>Profit · ${P[per].toLowerCase()}</small><strong>${money(rev-ex)}</strong></div><div class="kpi"><small>Money in (paid jobs)</small><strong>${money(rev)}</strong></div><div class="kpi"><small>Money out (costs)</small><strong>${money(ex)}</strong></div><div class="kpi"><small>Owed to you (all time)</small><strong>${money(owed)}</strong></div></div>`;
+  const n=new Date(),ms=[];for(let i=5;i>=0;i--){const d=new Date(n.getFullYear(),n.getMonth()-i,1);ms.push([d.getFullYear(),d.getMonth()])}
+  const mv=ms.map(([y,m])=>{const k=y+'-'+String(m+1).padStart(2,'0');const r=S.jobs.filter(j=>j.paid&&(j.date||'').startsWith(k)).reduce((a,j)=>a+num(j.price),0);const e=S.expenses.filter(x=>(x.date||'').startsWith(k)).reduce((a,x)=>a+num(x.amt),0)+S.jobs.filter(j=>j.status==='done'&&(j.date||'').startsWith(k)).reduce((a,j)=>a+jobCost(j),0);return {l:MON[m],r,e}});
+  const mx=Math.max(1,...mv.map(v=>Math.max(v.r,v.e)));
+  h+=`<div class="card"><h3>Last 6 months</h3><div class="note" style="margin:0 0 6px">Blue = money in, yellow = money out. Right column = profit.</div>${mv.map(v=>`<div class="mrow"><span>${v.l}</span><div><div class="b" style="width:${v.r/mx*100}%"></div><div class="b e" style="width:${v.e/mx*100}%"></div></div><span class="v${v.r-v.e<0?' neg':''}">${money(v.r-v.e)}</span></div>`).join('')}</div>`;
+  const dj=S.jobs.filter(j=>j.status==='done'&&inPer(j.date)).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  h+=`<div class="card"><h3>Profit by job</h3>${dj.length?`<table class="stack"><thead><tr><th>Job</th><th class="r">Charged</th><th class="r">Costs</th><th class="r">Profit</th></tr></thead><tbody>${dj.map(j=>{const p=num(j.price)-jobCost(j);return `<tr><td>${esc(j.name||'Customer')} · ${nice(j.date)}${j.paid?'':' <span class="tag y">unpaid</span>'}</td><td class="r">${money(num(j.price))}</td><td class="r">${money(jobCost(j))}</td><td class="r${p<0?' neg':''}">${money(p)}</td></tr>`}).join('')}</tbody></table>`:'<div class="note">Finished jobs show up here. Mark a job Done in its editor.</div>'}</div>`;
+  const xs=S.expenses.filter(x=>inPer(x.date)).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  h+=`<div class="card"><h3>Business expenses</h3><div class="row"><label>Date<input type="date" id="x-date" value="${TODAY}"></label><label>What<input id="x-label" placeholder="Gas, chemicals, nozzles…"></label><label>Type<select id="x-cat">${['Gas','Chemicals','Equipment','Repairs','Marketing','Other'].map(c=>`<option>${c}</option>`).join('')}</select></label><label>Amount<input id="x-amt" type="number" inputmode="decimal" step="0.01" placeholder="0.00"></label><button class="btn" data-a="addx">Add</button></div>`;
+  h+=xs.length?`<table class="stack" style="margin-top:10px"><thead><tr><th>Date</th><th>What</th><th>Type</th><th class="r">Amount</th><th></th></tr></thead><tbody>${xs.map(x=>`<tr><td>${nice(x.date)}</td><td>${esc(x.label)}</td><td>${esc(x.cat)}</td><td class="r">${money(num(x.amt))}</td><td class="r"><button class="x" data-a="delx" data-id="${esc(x.id)}" aria-label="Delete expense">×</button></td></tr>`).join('')}</tbody></table>`:'<div class="note">No expenses in this period.</div>';
+  $('#view').innerHTML=h+'</div><p class="note">Costs you add inside a job (soap, gas for that trip) count once the job is marked Done.</p>';
+}
+
+/* ---------- setup ---------- */
+function vSetup(){
+  const st=S.settings;
+  let h=`<div class="bar"><h2>Setup</h2></div><div class="card"><h3>When I take jobs</h3><div class="grid"><label>Start of work day<input type="time" data-s="dayStart" value="${esc(st.dayStart)}"></label><label>End of work day<input type="time" data-s="dayEnd" value="${esc(st.dayEnd)}"></label></div><div class="chips" style="margin-top:12px">${DAYS.map((d,i)=>`<button class="chip${st.workDays.includes(i)?' on':''}" data-a="wd" data-v="${i}" aria-pressed="${st.workDays.includes(i)}">${d}</button>`).join('')}</div><div class="note">Highlighted days are days you take jobs. Free time is shown inside these hours.</div></div>`;
+  h+=`<div class="card"><h3>My regular activities</h3><div class="note" style="margin:0 0 10px">Things that happen every week at the same time. They block that time on the Week tab.</div>${S.commitments.length?'<div class="list">'+S.commitments.slice().sort((a,b)=>((+a.day+6)%7)-((+b.day+6)%7)||a.start.localeCompare(b.start)).map(c=>`<div class="row" style="align-items:center"><span><b>${DAYS[+c.day]}</b> ${fmtT(toMin(c.start))}–${fmtT(toMin(c.end))} · ${esc(c.label)}</span><button class="x" data-a="delc" data-id="${esc(c.id)}" aria-label="Delete activity">×</button></div>`).join('')+'</div>':''}<div class="row" style="margin-top:10px"><label>Day<select id="c-day">${DAYS.map((d,i)=>`<option value="${i}"${i===1?' selected':''}>${d}</option>`).join('')}</select></label><label>From<input type="time" id="c-start" value="09:00"></label><label>To<input type="time" id="c-end" value="12:00"></label><label>What<input id="c-label" placeholder="Class, gym, other job…"></label><button class="btn" data-a="addc">Add</button></div></div>`;
+  h+=`<div class="card"><h3>My prices</h3><div class="note" style="margin:0 0 10px">Used to suggest a price from square footage. These are starting numbers: change them to what you charge.</div>${st.rates.map(r=>`<div class="row"><label>Service<input data-r="${esc(r.id)}" data-f="name" value="${esc(r.name)}"></label><label>$ per sq ft<input type="number" step="0.01" inputmode="decimal" data-r="${esc(r.id)}" data-f="per" value="${esc(r.per)}"></label><label>Minimum $<input type="number" step="1" inputmode="decimal" data-r="${esc(r.id)}" data-f="min" value="${esc(r.min)}"></label><button class="x" data-a="delr" data-id="${esc(r.id)}" aria-label="Delete service">×</button></div>`).join('')}<button class="btn ghost sm" data-a="addr" style="margin-top:10px">+ Add a service</button></div>`;
+  h+=`<div class="card"><h3>Setup guide</h3><div class="note" style="margin:0 0 10px">Walk through the first-time setup again. Nothing gets deleted.</div><button class="btn ghost" data-a="rerun">Run setup again</button></div>`;
+  const lb=S.lastBackup?new Date(S.lastBackup):null;
+  h+=`<div class="card"><h3>Backup</h3><div class="note" style="margin:0 0 10px">Your jobs and photos are saved on this phone only. Save a backup file now and then (Google Drive, email it to yourself) so you never lose them. Last backup: <b>${lb?MON[lb.getMonth()]+' '+lb.getDate()+', '+lb.getFullYear():'never'}</b></div><div class="row"><button class="btn" data-a="backup">Save backup file</button>${navigator.canShare?'<button class="btn ghost" data-a="sharebk">Send backup to…</button>':''}<label class="btn ghost" style="display:inline-flex;align-items:center">Restore from backup<input type="file" id="rfile" accept=".json,application/json" style="display:none"></label></div>${restoreData?`<div class="card" style="margin:12px 0 0;border-color:var(--red)"><b>Replace everything in the app with this backup?</b> It has ${restoreData.state.jobs?restoreData.state.jobs.length:0} jobs. What's in the app now will be erased.<div class="row" style="margin-top:10px"><button class="btn warn" data-a="dorestore">Yes, restore</button><button class="btn ghost" data-a="norestore">Cancel</button></div></div>`:''}</div>`;
+  $('#view').innerHTML=h;
+}
+
+/* ---------- first-run setup ---------- */
+let wz=0;
+const WZN=6;
+function vWizard(){
+  const st=S.settings;const bar='<div class="steps">'+Array.from({length:WZN+1},(_,i)=>`<i class="${i<=wz?'on':''}"></i>`).join('')+'</div>';
+  let h='<div class="wzs">'+bar;
+  if(wz===0)h+=`<h2>Welcome to Wash Jobs</h2><p class="lead">Let's set up your app in about 2 minutes: your hours, your weekly activities, your prices, and any jobs and equipment you already have. You can skip anything and change it later in Setup.</p><p class="note">Everything is saved on this phone. Make a backup now and then from the Setup tab.</p>`;
+  if(wz===1)h+=`<h2>When do you work?</h2><p class="lead">Pick the hours and days you take jobs. The app shows your free time inside these hours.</p><div class="grid"><label>Start of work day<input type="time" data-s="dayStart" value="${esc(st.dayStart)}"></label><label>End of work day<input type="time" data-s="dayEnd" value="${esc(st.dayEnd)}"></label></div><div class="chips" style="margin-top:14px">${DAYS.map((d,i)=>`<button class="chip${st.workDays.includes(i)?' on':''}" data-a="wd" data-v="${i}" aria-pressed="${st.workDays.includes(i)}">${d}</button>`).join('')}</div>`;
+  if(wz===2)h+=`<h2>Your regular activities</h2><p class="lead">Anything you do every week at the same time (school, gym, another job). It gets blocked out on your schedule.</p>${S.commitments.map(c=>`<div class="mini"><span><b>${DAYS[+c.day]}</b> ${fmtT(toMin(c.start))}–${fmtT(toMin(c.end))} · ${esc(c.label)}</span><button class="x" data-a="delc" data-id="${esc(c.id)}" aria-label="Delete activity">×</button></div>`).join('')}<div class="row" style="margin-top:10px"><label>Day<select id="c-day">${DAYS.map((d,i)=>`<option value="${i}"${i===1?' selected':''}>${d}</option>`).join('')}</select></label><label>From<input type="time" id="c-start" value="09:00"></label><label>To<input type="time" id="c-end" value="12:00"></label><label>What<input id="c-label" placeholder="School, gym…"></label><button class="btn" data-a="addc">Add</button></div><p class="note">Add as many as you need, then tap Next.</p>`;
+  if(wz===3)h+=`<h2>Your prices</h2><p class="lead">The app uses these to suggest a price from square feet. Change them to what you charge.</p>${st.rates.map(r=>`<div class="row"><label>Service<input data-r="${esc(r.id)}" data-f="name" value="${esc(r.name)}"></label><label>$ per sq ft<input type="number" step="0.01" inputmode="decimal" data-r="${esc(r.id)}" data-f="per" value="${esc(r.per)}"></label><label>Minimum $<input type="number" step="1" inputmode="decimal" data-r="${esc(r.id)}" data-f="min" value="${esc(r.min)}"></label><button class="x" data-a="delr" data-id="${esc(r.id)}" aria-label="Delete service">×</button></div>`).join('')}<button class="btn ghost sm" data-a="addr" style="margin-top:10px">+ Add a service</button>`;
+  if(wz===4){const L={paid:'Done & paid',owed:'Done, not paid yet',up:'Coming up'};h+=`<h2>Jobs you already have</h2><p class="lead">Add jobs you've already done (paid or not) and jobs coming up. No jobs yet? Just tap Next.</p>${S.jobs.map(j=>`<div class="mini"><span><b>${esc(j.name)}</b> · ${nice(j.date)} · ${money(num(j.price))} <span class="tag ${status(j)[1]}">${status(j)[0]}</span></span><button class="x" data-a="wzdel" data-id="${esc(j.id)}" aria-label="Remove job">×</button></div>`).join('')}
+  <div class="card" style="margin-top:12px"><div class="grid"><label>Customer name<input id="w-name"></label><label>Phone<input id="w-phone" type="tel" inputmode="tel"></label></div><div style="margin-top:10px"><label>Address<input id="w-addr"></label></div><div class="grid" style="margin-top:10px"><label>Date<input id="w-date" type="date" value="${TODAY}"></label><label>Time<input id="w-time" type="time" value="${esc(st.dayStart)}"></label><label>Price $<input id="w-price" type="number" step="0.01" inputmode="decimal"></label><label>This job is<select id="w-st">${Object.entries(L).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></label></div><button class="btn" data-a="wzjob" style="margin-top:12px">Add job</button></div>`}
+  if(wz===5)h+=`<h2>Equipment and costs so far</h2><p class="lead">Add what you've already spent on the business (pressure washer, hose, surface cleaner, chemicals) so your profit is right from day one.</p>${S.expenses.map(x=>`<div class="mini"><span>${nice(x.date)} · ${esc(x.label)} · <b>${money(num(x.amt))}</b></span><button class="x" data-a="delx" data-id="${esc(x.id)}" aria-label="Delete expense">×</button></div>`).join('')}<div class="row" style="margin-top:10px"><label>Date<input type="date" id="x-date" value="${TODAY}"></label><label>What<input id="x-label" placeholder="Hose, surface cleaner…"></label><label>Type<select id="x-cat">${['Equipment','Chemicals','Gas','Repairs','Marketing','Other'].map(c=>`<option>${c}</option>`).join('')}</select></label><label>Amount<input id="x-amt" type="number" inputmode="decimal" step="0.01" placeholder="0.00"></label><button class="btn" data-a="addx">Add</button></div>`;
+  if(wz===6)h+=`<h2>You're all set</h2><p class="lead">${S.jobs.length} job${S.jobs.length===1?'':'s'}, ${S.commitments.length} weekly activit${S.commitments.length===1?'y':'ies'} and ${S.expenses.length} expense${S.expenses.length===1?'':'s'} added. On jobs, tap <b>✓ Job done</b> and <b>$ Got paid</b> as you go.</p>`;
+  h+=`<div class="wnav">${wz>0?'<button class="btn ghost" data-a="wzb">Back</button>':''}<span class="sp"></span>${wz>0&&wz<WZN?'<button class="btn ghost" data-a="wzn">Skip</button>':''}<button class="btn" data-a="${wz<WZN?'wzn':'wzend'}">${wz===0?"Let's go":wz<WZN?'Next':'Start using Wash Jobs'}</button></div></div>`;
+  $('#view').innerHTML=h;
+}
+
+/* ---------- job editor ---------- */
+function openJob(j){draft=JSON.parse(JSON.stringify(j));delAsk=false;drawSheet()}
+function grab(){if(!draft)return;document.querySelectorAll('#modal [data-j]').forEach(el=>{draft[el.dataset.j]=el.type==='checkbox'?el.checked:el.value});document.querySelectorAll('#modal [data-cost]').forEach(el=>{const c=draft.costs[+el.dataset.cost];if(c)c[el.dataset.f]=el.value})}
+const sugHtml=sg=>sg!==null?`Suggested from your prices: <b>${money(sg)}</b> <button class="btn ghost sm" data-a="usesug">Use it</button>`:'Pick a service and enter square feet to get a suggested price.';
+function drawSheet(){
+  const d=draft;if(!d){$('#modal').innerHTML='';return}
+  const sg=suggest(d.service,d.sqft),ph=String(d.phone||'').replace(/[^\d+]/g,'');
+  const f=(k,l,t='text',x='')=>`<label>${l}<input type="${t}" data-j="${k}" value="${esc(d[k])}" ${x}></label>`;
+  $('#modal').innerHTML=`<div class="scrim" data-a="close"><div class="sheet" role="dialog" aria-modal="true" aria-label="Job details">
+  <div class="bar"><h2>${S.jobs.some(j=>j.id===d.id)?'Edit job':'New job'}</h2><span class="sp"></span><button class="x" data-a="close" aria-label="Close">×</button></div>
+  <h4>Customer</h4><div class="grid">${f('name','Name')}${f('phone','Phone','tel','inputmode="tel"')}</div><div style="margin-top:10px">${f('address','Address')}</div>
+  <div class="links">${ph?`<a href="tel:${esc(ph)}">Call ${esc(d.phone)}</a><button class="btn ghost sm" data-a="copy">Copy number</button>`:''}${d.address?`<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(d.address)}" target="_blank" rel="noopener">Open in Maps</a>`:''}</div>
+  <h4>When</h4><div class="grid">${f('date','Date','date')}${f('time','Start time','time')}${f('hours','Hours it takes','number','step="0.5" min="0.5" inputmode="decimal"')}</div>
+  <h4>Price</h4><div class="grid"><label>Service<select data-j="service"><option value="">Choose…</option>${S.settings.rates.map(r=>`<option value="${esc(r.id)}"${r.id===d.service?' selected':''}>${esc(r.name)}</option>`).join('')}</select></label>${f('sqft','Square feet','number','inputmode="numeric" min="0"')}${f('price','Price I charge $','number','step="0.01" inputmode="decimal"')}</div>
+  <div class="sug" id="sug">${sugHtml(sg)}</div>
+  <h4>Status</h4><div class="grid"><label>Status<select data-j="status">${[['quote','Quote (not booked)'],['scheduled','Scheduled'],['done','Done']].map(o=>`<option value="${o[0]}"${d.status===o[0]?' selected':''}>${o[1]}</option>`).join('')}</select></label><label>Paid by<select data-j="pay">${['','Cash','Zelle','Venmo','Cash App','Card','Check'].map(o=>`<option${d.pay===o?' selected':''}>${o}</option>`).join('')}</select></label><label style="display:flex;gap:8px;align-items:center;margin-top:22px"><input type="checkbox" data-j="paid" ${d.paid?'checked':''} style="width:24px;min-height:24px"> Paid</label></div>
+  <div class="grid" style="margin-top:10px"><label>Purpose<select data-j="purpose">${['Cleaning','Prep for sealing','Prep for painting'].map(o=>`<option${d.purpose===o?' selected':''}>${o}</option>`).join('')}</select></label></div>
+  <h4>Costs for this job</h4>${(d.costs||[]).map((c,i)=>`<div class="row"><label>What<input data-cost="${i}" data-f="label" value="${esc(c.label)}" placeholder="Chemicals, gas…"></label><label>Amount $<input type="number" step="0.01" inputmode="decimal" data-cost="${i}" data-f="amt" value="${esc(c.amt)}"></label><button class="x" data-a="delcost" data-v="${i}" aria-label="Remove cost">×</button></div>`).join('')}<button class="btn ghost sm" data-a="addcost">+ Add a cost</button>
+  <h4>Photos of the house</h4><div class="pics">${(d.photos||[]).map((p,i)=>`<div class="pic"><img data-pid="${esc(p.id)}" alt="Job photo ${i+1}" loading="lazy"><button data-a="delpic" data-v="${i}" aria-label="Remove photo">×</button></div>`).join('')}<label class="upl">+ Add photos<input type="file" accept="image/*" multiple id="pfile"></label></div>
+  <h4>Notes</h4><label>Gate code, problem spots, what they asked for<textarea data-j="notes">${esc(d.notes)}</textarea></label>
+  <div class="acts">${d.paid?'':d.status==='done'?'<button class="btn yel" data-a="spaid">$ Got paid</button>':'<button class="btn yel" data-a="sdone">✓ Job done</button><button class="btn yel" data-a="sboth">Done + paid</button>'}<button class="btn" data-a="savejob">Save job</button>${S.jobs.some(j=>j.id===d.id)?(delAsk?'<button class="btn warn" data-a="deljob">Yes, delete</button><button class="btn ghost" data-a="nodel">Keep it</button>':'<button class="btn ghost" data-a="askdel">Delete</button>'):''}</div>
+  </div></div>`;
+  document.querySelectorAll('#modal img[data-pid]').forEach(async im=>{try{im.src=await photoURL(im.dataset.pid)}catch(e){}});
+}
+async function shrink(file){try{const b=await createImageBitmap(file);const k=Math.min(1,1600/Math.max(b.width,b.height));const c=document.createElement('canvas');c.width=Math.round(b.width*k);c.height=Math.round(b.height*k);c.getContext('2d').drawImage(b,0,0,c.width,c.height);return await new Promise(r=>c.toBlob(x=>r(x||file),'image/jpeg',.82))}catch(e){return file}}
+
+/* ---------- render + events ---------- */
+function render(){
+  const t=(location.hash||'#week').slice(1);const tab=['week','jobs','money','setup'].includes(t)?t:'week';
+  document.querySelectorAll('nav.tabs a').forEach(a=>a.classList.toggle('on',a.dataset.t===tab));
+  document.body.classList.toggle('wz',!S.setupDone);if(!S.setupDone){vWizard();return}
+  stats();({week:vWeek,jobs:vJobs,money:vMoney,setup:vSetup})[tab]();
+}
+window.addEventListener('hashchange',render);
+document.addEventListener('click',async e=>{
+  const el=e.target.closest('[data-a]');if(!el)return;const a=el.dataset.a,v=el.dataset.v;
+  if(a==='close'&&e.target!==el)return;
+  if(['savejob','usesug','addcost','delcost','delpic','copy','askdel','nodel','sdone','sboth','spaid'].includes(a))grab();
+  if(a==='sdone'||a==='sboth'||a==='spaid'){draft.status='done';if(a!=='sdone')draft.paid=true;}
+  if(a==='qdone'||a==='qboth'||a==='qpaid'||a==='qbook'){const j=S.jobs.find(x=>x.id===el.dataset.id);if(!j)return;if(a==='qbook')j.status='scheduled';else{j.status='done';if(a!=='qdone')j.paid=true}toast(a==='qbook'?'Booked':a==='qdone'?'Done! Tap Got paid when they pay':'Marked paid');save();return}
+  switch(a){
+    case 'install':if(installEvt){installEvt.prompt();installEvt=null;render()}break;
+    case 'backup':case 'sharebk':{toast('Making backup…',20000);const photos={};for(const j of S.jobs)for(const p of (j.photos||[])){try{const b=await getPhoto(p.id);if(b)photos[p.id]=await toData(b)}catch(err){}}
+      S.lastBackup=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(err){}
+      const name='wash-jobs-backup-'+TODAY+'.json',blob=new Blob([JSON.stringify({app:'washjobs',v:1,made:new Date().toISOString(),state:S,photos})],{type:'application/json'});
+      if(a==='sharebk'){try{const f=new File([blob],name,{type:'application/json'});await navigator.share({files:[f],title:'Wash Jobs backup'});toast('Backup sent')}catch(err){toast('Share cancelled')}}
+      else{const u=URL.createObjectURL(blob),l=document.createElement('a');l.href=u;l.download=name;document.body.append(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),5000);toast('Backup saved to Downloads')}
+      render();break}
+    case 'norestore':restoreData=null;render();break;
+    case 'dorestore':{const d=restoreData;restoreData=null;toast('Restoring…',20000);for(const [id,u] of Object.entries(d.photos||{})){try{await putPhoto(id,await (await fetch(u)).blob())}catch(err){}}
+      S=Object.assign({settings:{},commitments:[],jobs:[],expenses:[]},d.state);S.settings=Object.assign({dayStart:'08:00',dayEnd:'18:00',workDays:[1,2,3,4,5,6],rates:[]},S.settings);save();toast('Backup restored');break}
+    case 'wzn':wz=Math.min(WZN,wz+1);render();scrollTo(0,0);break;
+    case 'wzb':wz=Math.max(0,wz-1);render();scrollTo(0,0);break;
+    case 'wzend':S.setupDone=true;location.hash='#week';save();scrollTo(0,0);break;
+    case 'rerun':wz=0;S.setupDone=false;save();scrollTo(0,0);break;
+    case 'wzdel':S.jobs=S.jobs.filter(j=>j.id!==el.dataset.id);save();break;
+    case 'wzjob':{const name=$('#w-name').value.trim();if(!name){toast('Add the customer name');return}const k=$('#w-st').value;S.jobs.push({id:uid(),name,phone:$('#w-phone').value.trim(),address:$('#w-addr').value.trim(),date:$('#w-date').value||TODAY,time:$('#w-time').value,hours:2,price:$('#w-price').value,status:k==='up'?'scheduled':'done',paid:k==='paid',pay:'',purpose:'Cleaning',costs:[],photos:[],notes:''});save();toast('Job added');break}
+    case 'wk':wk=v==='0'?0:wk+(+v);render();break;
+    case 'new':openJob({id:uid(),date:TODAY,time:S.settings.dayStart,hours:2,status:'scheduled',purpose:'Cleaning',costs:[],photos:[]});break;
+    case 'book':openJob({id:uid(),date:el.dataset.d,time:el.dataset.t,hours:2,status:'scheduled',purpose:'Cleaning',costs:[],photos:[]});break;
+    case 'edit':{const j=S.jobs.find(x=>x.id===el.dataset.id);if(j)openJob(j);break}
+    case 'close':draft=null;drawSheet();break;
+    case 'usesug':{const s=suggest(draft.service,draft.sqft);if(s!==null){draft.price=s;const p=document.querySelector('#modal [data-j=price]');if(p)p.value=s}break}
+    case 'addcost':draft.costs=(draft.costs||[]).concat({label:'',amt:''});drawSheet();break;
+    case 'delcost':draft.costs.splice(+v,1);drawSheet();break;
+    case 'delpic':draft.photos.splice(+v,1);drawSheet();break;
+    case 'copy':navigator.clipboard.writeText(String(draft.phone||'')).then(()=>toast('Number copied'),()=>toast('Copy blocked: '+draft.phone));break;
+    case 'askdel':delAsk=true;drawSheet();break;
+    case 'nodel':delAsk=false;drawSheet();break;
+    case 'deljob':S.jobs=S.jobs.filter(j=>j.id!==draft.id);draft=null;drawSheet();save();break;
+    case 'sdone':case 'sboth':case 'spaid':
+    case 'savejob':{if(!String(draft.name||'').trim()){toast('Add the customer name');return}if(draft.paid&&draft.status!=='done')draft.status='done';const i=S.jobs.findIndex(j=>j.id===draft.id);draft.costs=(draft.costs||[]).filter(c=>c.label||num(c.amt));if(i<0)S.jobs.push(draft);else S.jobs[i]=draft;draft=null;drawSheet();save();break}
+    case 'jf':jf=v;render();break;
+    case 'per':per=v;render();break;
+    case 'addx':{const amt=num($('#x-amt').value),label=$('#x-label').value.trim();if(!amt||!label){toast('Add what it was and the amount');return}S.expenses.push({id:uid(),date:$('#x-date').value||TODAY,label,cat:$('#x-cat').value,amt});save();break}
+    case 'delx':S.expenses=S.expenses.filter(x=>x.id!==el.dataset.id);save();break;
+    case 'wd':{const n=+v,w=S.settings.workDays;S.settings.workDays=w.includes(n)?w.filter(x=>x!==n):w.concat(n);save();break}
+    case 'addc':{const label=$('#c-label').value.trim(),s=$('#c-start').value,en=$('#c-end').value;if(!label||!s||!en||toMin(en)<=toMin(s)){toast('Add a name and an end time after the start');return}S.commitments.push({id:uid(),day:+$('#c-day').value,start:s,end:en,label});save();break}
+    case 'delc':S.commitments=S.commitments.filter(c=>c.id!==el.dataset.id);save();break;
+    case 'addr':S.settings.rates.push({id:uid(),name:'New service',per:0.2,min:100});save();break;
+    case 'delr':S.settings.rates=S.settings.rates.filter(r=>r.id!==el.dataset.id);save();break;
+  }
+});
+document.addEventListener('change',async e=>{
+  const t=e.target;
+  if(t.dataset.s){S.settings[t.dataset.s]=t.value;save();return}
+  if(t.dataset.r){const r=rateFor(t.dataset.r);if(r){r[t.dataset.f]=t.dataset.f==='name'?t.value:num(t.value);save()}return}
+  if(t.id==='rfile'&&t.files[0]){try{const d=JSON.parse(await t.files[0].text());if(d.app!=='washjobs'||!d.state)throw 0;restoreData=d;render()}catch(err){toast('That file is not a Wash Jobs backup')}return}
+  if(t.id==='pfile'&&draft){
+    grab();const files=[...t.files];toast('Adding '+files.length+' photo'+(files.length>1?'s':'')+'…',20000);
+    for(const f of files){try{const id=uid();await putPhoto(id,await shrink(f));if(draft)draft.photos=(draft.photos||[]).concat({id})}catch(err){toast('A photo could not be saved')}}
+    toast('Photos added. Tap Save job.');drawSheet();
+  }
+});
+document.addEventListener('input',e=>{if(draft&&(e.target.dataset.j==='service'||e.target.dataset.j==='sqft')){draft[e.target.dataset.j]=e.target.value;const g=$('#sug');if(g)g.innerHTML=sugHtml(suggest(draft.service,draft.sqft));return}if(e.target.id==='q'){q=e.target.value;const p=e.target.selectionStart;vJobs();const n=$('#q');n.focus();try{n.setSelectionRange(p,p)}catch(_){}}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&draft){draft=null;drawSheet()}if((e.key==='Enter'||e.key===' ')&&e.target.getAttribute&&e.target.getAttribute('role')==='button'){e.preventDefault();e.target.click()}});
+render();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installEvt=e;render()});
+window.addEventListener('appinstalled',()=>{installEvt=null;render();toast('Installed!')});
+}
+</script>
+</body></html>
